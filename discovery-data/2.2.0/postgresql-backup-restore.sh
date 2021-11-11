@@ -137,9 +137,12 @@ if [ `compare_version "${WD_VERSION}" 4.0.0` -ge 0 ] || "${BACKUP_RESTORE_IN_POD
   if [ -z "$(ls tmp)" ] ; then
     rm -rf tmp
   fi
+  # backup/restore complete in pod, exit script
   exit 0
 fi
+######################## End of backup/restore in pod ########################
 
+######################## Start of local backup/restore ########################
 # backup
 if [ ${COMMAND} = 'backup' ] ; then
   brlog "INFO" "Start backup postgresql..."
@@ -214,7 +217,7 @@ if [ ${COMMAND} = 'restore' ] ; then
   export PGPASSWORD=${STKEEPER_PG_SU_PASSWORD} && \
   export PGHOST=${HOSTNAME} && \
   cd tmp && \
-  for DATABASE in $(ls '${PG_BACKUP_DIR}'/*.dump | cut -d "/" -f 2 | sed -e "s/^pg_//g" -e "s/.dump$//g"); do
+  for DATABASE in $(ls '${PG_BACKUP_DIR}'/*'${PG_BACKUP_SUFFIX}' | cut -d "/" -f 2 | sed -e "s/^pg_//g" -e "s/'${PG_BACKUP_SUFFIX}'$//g"); do
   psql -d ${DATABASE} -c "REVOKE CONNECT ON DATABASE ${DATABASE} FROM public;" && \
   psql -d ${DATABASE} -c "SELECT pid, pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = current_database() AND pid <> pg_backend_pid();" && \
   dropdb --if-exists ${DATABASE} && \

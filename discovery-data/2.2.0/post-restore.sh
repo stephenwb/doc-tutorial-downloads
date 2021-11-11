@@ -3,7 +3,7 @@
 set -euo pipefail
 
 printUsage() {
-  echo "Usage: $(basename ${0}) [tenant_name]"
+  echo "Usage: $(basename ${0}) tenant_name [-n namespace]"
   exit 1
 }
 
@@ -80,7 +80,7 @@ else
 fi
 
 for tenants_file in `ls -t tmp_wd_tenants_*.txt` ; do
-  if [ -n "`cat ${tenants_file}`" ] ; then
+  if [ -s ${tenants_file} ] ; then
     kube_cp_from_local ${PG_POD} "${tenants_file}" "/tmp/tenants" ${OC_ARGS}
     fetch_cmd_result ${PG_POD} 'export PGUSER=${PGUSER:-$STKEEPER_PG_SU_USERNAME} && \
       export PGPASSWORD=${PGPASSWORD:-$STKEEPER_PG_SU_PASSWORD} && \
@@ -107,15 +107,14 @@ if [ `compare_version "${WD_VERSION}" "2.2.1"` -ge 0 ] && [ `compare_version "${
       psql -d dadmin -c "UPDATE datasets SET tenant_id = '"'default'"' ;" ' ${OC_ARGS}
 fi
 ## End set default
+
+## Update ranker version to run retrain
 fetch_cmd_result ${PG_POD} 'export PGUSER=${PGUSER:-$STKEEPER_PG_SU_USERNAME} && \
       export PGPASSWORD=${PGPASSWORD:-$STKEEPER_PG_SU_PASSWORD} && \
       export PGHOST=${PGHOST:-$HOSTNAME} && \
       psql -d ranker_training -c "UPDATE data SET version = version+1;" && \
       psql -d ranker_training -c "WITH T AS (SELECT DISTINCT ON (training_set_id) training_job_id from jobs ORDER BY training_set_id, data_version DESC) UPDATE jobs SET state = '"'"'INVALIDATE_RANKER'"'"' where training_job_id IN (select training_job_id from T);"
       ' ${OC_ARGS}
-
-## Update ranker version to run retrain
-
 ## End update ranker
 
 if [ `compare_version "${WD_VERSION}" "4.0.0"` -ge 0 ] ; then

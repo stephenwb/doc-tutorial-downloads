@@ -22,7 +22,7 @@ SED_REG_OPT="`get_sed_reg_opt`"
 SCRIPT_DIR=${SCRIPT_DIR}
 
 printUsage() {
-  echo "Usage: $(basename ${0}) [command] [releaseName] [-f backupFile]"
+  echo "Usage: $(basename ${0}) command releaseName [-f backupFile] [-n namespace]"
   exit 1
 }
 
@@ -83,7 +83,6 @@ if "${BACKUP_RESTORE_IN_POD}" ; then
   ELASTIC_SECRET=`oc ${OC_ARGS} get secret -l tenant=${TENANT_NAME},run=elastic-secret -o jsonpath="{.items[*].metadata.name}"`
   MINIO_CONFIGMAP=`oc get ${OC_ARGS} configmap -l tenant=${TENANT_NAME},app=minio -o jsonpath="{.items[0].metadata.name}"`
   DISCO_SVC_ACCOUNT=`get_service_account`
-  NAMESPACE=${NAMESPACE:-`oc config view --minify --output 'jsonpath={..namespace}'`}
   CURRENT_TZ=`date "+%z" | tr -d '0'`
   if echo "${CURRENT_TZ}" | grep "+" > /dev/null; then
     TZ_OFFSET="UTC-`echo ${CURRENT_TZ} | tr -d '+'`"
@@ -141,7 +140,7 @@ if "${BACKUP_RESTORE_IN_POD}" ; then
   if [ "${COMMAND}" = "backup" ] ; then
     brlog "INFO" "Transferring backup data"
     kube_cp_to_local ${POD} "${BACKUP_FILE}" "${BACKUP_RESTORE_DIR_IN_POD}/${MINIO_BACKUP}" ${OC_ARGS}
-    if "${VERIFY_DATASTORE_ARCHIVE}" && brlog "INFO" "Verifying backup archive" && ! tar ${ELASTIC_TAR_OPTIONS[@]} -tf ${BACKUP_FILE} &> /dev/null ; then
+    if "${VERIFY_DATASTORE_ARCHIVE}" && brlog "INFO" "Verifying backup archive" && ! tar ${MINIO_TAR_OPTIONS[@]} -tf ${BACKUP_FILE} &> /dev/null ; then
       brlog "ERROR" "Backup file is broken, or does not exist."
       oc ${OC_ARGS} exec ${POD} -- bash -c "cd ${BACKUP_RESTORE_DIR_IN_POD}; ls | xargs rm -rf"
       exit 1
