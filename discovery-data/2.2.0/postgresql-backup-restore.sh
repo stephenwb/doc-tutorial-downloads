@@ -21,7 +21,7 @@ CURRENT_COMPONENT="postgresql"
 POSTGRES_CONFIG_JOB="wire-postgres"
 
 printUsage() {
-  echo "Usage: $(basename ${0}) [command] [releaseName] [-f backupFile]"
+  echo "Usage: $(basename ${0}) command releaseName [ -f backupFile ] [ -n namespace ]"
   exit 1
 }
 

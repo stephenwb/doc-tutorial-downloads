@@ -28,7 +28,7 @@ MINIO_FORWARD_PORT=${MINIO_FORWARD_PORT:-39001}
 DISABLE_MC_MULTIPART=${DISABLE_MC_MULTIPART:-true}
 
 printUsage() {
-  echo "Usage: $(basename ${0}) [command] [releaseName] [-f backupFile]"
+  echo "Usage: $(basename ${0}) command releaseName [ -f backupFile ] [ -n namespace ]"
   exit 1
 }
 

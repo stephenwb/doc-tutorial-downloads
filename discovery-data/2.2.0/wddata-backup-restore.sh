@@ -15,7 +15,7 @@ TMP_WORK_DIR="tmp/wddata"
 CURRENT_COMPONENT="wddata"
 
 printUsage() {
-  echo "Usage: $(basename ${0}) [command] [releaseName] [-f backupFile]"
+  echo "Usage: $(basename ${0}) command releaseName [ -f backupFile ] [ -n namespace ]"
   exit 1
 }
 

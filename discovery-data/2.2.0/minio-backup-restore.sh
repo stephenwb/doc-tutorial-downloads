@@ -22,7 +22,7 @@ SED_REG_OPT="`get_sed_reg_opt`"
 SCRIPT_DIR=${SCRIPT_DIR}
 
 printUsage() {
-  echo "Usage: $(basename ${0}) command releaseName [-f backupFile] [-n namespace]"
+  echo "Usage: $(basename ${0}) command releaseName [ -f backupFile ] [ -n namespace ]"
   exit 1
 }
 

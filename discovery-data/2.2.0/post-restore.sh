@@ -3,7 +3,7 @@
 set -euo pipefail
 
 printUsage() {
-  echo "Usage: $(basename ${0}) tenant_name [-n namespace]"
+  echo "Usage: $(basename ${0}) releaseName [ -n namespace ]"
   exit 1
 }
 

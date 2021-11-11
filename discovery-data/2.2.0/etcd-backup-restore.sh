@@ -18,7 +18,7 @@ TMP_WORK_DIR="tmp/etcd_workspace"
 CURRENT_COMPONENT="etcd"
 
 printUsage() {
-  echo "Usage: $(basename ${0}) [command] [tenantName] [-f backupFile]"
+  echo "Usage: $(basename ${0}) command releaseName [ -f backupFile ] [ -n namespace ]"
   exit 1
 }
 
